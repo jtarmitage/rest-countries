@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useState } from "react";
 import { CountriesGrid } from "./components/CountriesGrid";
 import { CountryInfo } from "./components/CountryInfo";

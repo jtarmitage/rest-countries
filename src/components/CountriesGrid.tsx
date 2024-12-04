@@ -5,8 +5,6 @@ import { transformCountryData } from "../utils/countryUtils";
 import { IRow, Country } from "./../utils/types";
 import "@ag-grid-community/styles/ag-grid.css";
 import "@ag-grid-community/styles/ag-theme-quartz.css";
-
-// Register ag-Grid module
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { ModuleRegistry } from "@ag-grid-community/core";
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
