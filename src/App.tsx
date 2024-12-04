@@ -117,16 +117,22 @@ const CountriesGrid = ({
           throw new Error("Failed to fetch countries data");
         }
         const data: Country[] = await response.json();
-        setRowData(data.map(transformCountryData));
+
+        // Retrieve favourites from localStorage
         const storedFavourites = JSON.parse(
           localStorage.getItem("favourites") || "{}"
         );
-        setRowData((prevRowData) =>
-          prevRowData.map((row) => ({
-            ...row,
-            favourite: storedFavourites[row.name] ?? row.favourite,
-          }))
-        );
+
+        // Map the country data and merge with stored favourites
+        const transformedData = data.map((country) => {
+          const countryData = transformCountryData(country);
+          return {
+            ...countryData,
+            favourite: storedFavourites[countryData.name] || false,
+          };
+        });
+
+        setRowData(transformedData);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred"
