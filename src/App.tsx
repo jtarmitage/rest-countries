@@ -160,7 +160,11 @@ const CountriesGrid = ({
     localStorage.setItem("favourites", JSON.stringify(favourites));
   }, [rowData]);
 
-  const FavouriteRenderer = (props: any) => {
+  const FavouriteRenderer = (props: {
+    value: boolean;
+    node: any;
+    data: IRow;
+  }) => {
     const { value, node, data } = props;
     const isFavourite = value;
 
