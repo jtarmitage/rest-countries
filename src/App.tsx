@@ -10,8 +10,12 @@ function App() {
   return (
     <div className="App">
       <h1>Countries App</h1>
-      <CountriesGrid selectedCountry={(country) => setCountry(country)} />
-      <CountryInfo countryName={country} />
+      <div className="countriesGrid">
+        <CountriesGrid selectedCountry={(country) => setCountry(country)} />
+      </div>
+      <div className="countryInfo">
+        <CountryInfo countryName={country} />
+      </div>
     </div>
   );
 }

@@ -111,7 +111,7 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
   return (
     <div
       className={"ag-theme-quartz"}
-      style={{ width: "100%", height: "500px" }}
+      style={{ width: "100%", height: "auto" }}
     >
       <AgGridReact
         rowData={rowData}
