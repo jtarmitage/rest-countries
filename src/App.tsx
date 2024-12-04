@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 // Theme
@@ -18,6 +18,7 @@ interface IRow {
   population: number;
   languages: string;
   currencies: string;
+  favourite?: boolean;
 }
 
 interface Country {
@@ -115,8 +116,17 @@ const CountriesGrid = ({
         if (!response.ok) {
           throw new Error("Failed to fetch countries data");
         }
-        const data: Country[] = await response.json(); // Explicitly define the response type
+        const data: Country[] = await response.json();
         setRowData(data.map(transformCountryData));
+        const storedFavourites = JSON.parse(
+          localStorage.getItem("favourites") || "{}"
+        );
+        setRowData((prevRowData) =>
+          prevRowData.map((row) => ({
+            ...row,
+            favourite: storedFavourites[row.name] ?? row.favourite,
+          }))
+        );
       } catch (error) {
         setError(
           error instanceof Error ? error.message : "An unknown error occurred"
@@ -132,6 +142,42 @@ const CountriesGrid = ({
   // Row Data: The data to be displayed.
   const [rowData, setRowData] = useState<IRow[]>([]);
 
+  // Load favourites from localStorage on component mount
+  useEffect(() => {}, []);
+
+  // Save favourites to localStorage
+  const saveFavouritesToLocalStorage = useCallback(() => {
+    const favourites: { [key: string]: boolean } = {};
+    rowData.forEach((row) => {
+      favourites[row.name] = row.favourite || false;
+    });
+    localStorage.setItem("favourites", JSON.stringify(favourites));
+  }, [rowData]);
+
+  const FavouriteRenderer = (props: any) => {
+    const { value, node, data } = props;
+    const isFavourite = value;
+
+    // Create the star icon
+    const handleClick = () => {
+      const newValue = !isFavourite;
+      node.setDataValue("favourite", newValue);
+
+      // Update the row data and save to localStorage
+      setRowData((prevData) =>
+        prevData.map((row) =>
+          row.name === data.name ? { ...row, favourite: newValue } : row
+        )
+      );
+    };
+
+    return (
+      <span onClick={handleClick} style={{ cursor: "pointer" }}>
+        {isFavourite ? "⭐" : "☆"}
+      </span>
+    );
+  };
+
   // Column Definitions: Defines & controls grid columns.
   const [colDefs, setColDefs] = useState<ColDef<IRow>[]>([
     { field: "name" },
@@ -139,6 +185,7 @@ const CountriesGrid = ({
     { field: "population", filter: "agNumberColumnFilter" },
     { field: "languages" },
     { field: "currencies" },
+    { field: "favourite", cellRenderer: FavouriteRenderer },
   ]);
 
   const defaultColDef: ColDef = {
@@ -160,6 +207,7 @@ const CountriesGrid = ({
         pagination={true}
         paginationPageSize={10}
         domLayout="autoHeight"
+        onCellClicked={saveFavouritesToLocalStorage}
       />
     </div>
   );
