@@ -142,14 +142,14 @@ const CountriesGrid = ({
   // Row Data: The data to be displayed.
   const [rowData, setRowData] = useState<IRow[]>([]);
 
-  // Load favourites from localStorage on component mount
-  useEffect(() => {}, []);
-
   // Save favourites to localStorage
   const saveFavouritesToLocalStorage = useCallback(() => {
     const favourites: { [key: string]: boolean } = {};
     rowData.forEach((row) => {
-      favourites[row.name] = row.favourite || false;
+      if (row.favourite) {
+        // Only store countries that are favourited
+        favourites[row.name] = true;
+      }
     });
     localStorage.setItem("favourites", JSON.stringify(favourites));
   }, [rowData]);
