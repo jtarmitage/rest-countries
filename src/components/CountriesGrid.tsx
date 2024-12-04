@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "@ag-grid-community/react";
 import { ColDef } from "@ag-grid-community/core";
 import { transformCountryData } from "../utils/countryUtils";
-import { IRow, Country } from "../utils/types";
+import { IRow, Country } from "./../utils/types";
 import "@ag-grid-community/styles/ag-grid.css";
 import "@ag-grid-community/styles/ag-theme-quartz.css";
 
