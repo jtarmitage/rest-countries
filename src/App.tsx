@@ -157,6 +157,9 @@ const CountriesGrid = ({
         columnDefs={colDefs}
         defaultColDef={defaultColDef}
         onRowClicked={(e) => selectedCountry(e.node.data.name)}
+        pagination={true}
+        paginationPageSize={10}
+        domLayout="autoHeight"
       />
     </div>
   );
@@ -195,7 +198,18 @@ const CountryInfo = ({ countryName }: { countryName: string }) => {
   }, [countryName]);
 
   return countryData.length > 0 ? (
-    <p>{countryData[0]?.name.common}</p>
+    <>
+      <h2>
+        {countryData[0].name.common} {countryData[0].flag}
+      </h2>
+      <p>Capital: {countryData[0].capital}</p>
+      <p>Population: {countryData[0].population}</p>
+      <p>
+        <a href={countryData[0].maps.googleMaps} target="blank">
+          Map
+        </a>
+      </p>
+    </>
   ) : (
     <p>Click on a country to view full details.</p>
   );
