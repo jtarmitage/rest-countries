@@ -99,14 +99,14 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
   };
 
   // Define columns using the types defined in GridRow
-  const [colDefs, setColDefs] = useState<ColDef<GridRow>[]>([
+  const colDefs: ColDef<GridRow>[] = [
     { field: "name" },
     { field: "flag", sortable: false },
     { field: "population", filter: "agNumberColumnFilter" },
     { field: "languages" },
     { field: "currencies" },
     { field: "favourite", cellRenderer: FavouriteRenderer },
-  ]);
+  ];
 
   const defaultColDef: ColDef = {
     flex: 1,
