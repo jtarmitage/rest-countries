@@ -1,5 +1,4 @@
-// src/utils/types.ts
-export interface IRow {
+export interface GridRow {
   name: string;
   flag: string;
   population: number;

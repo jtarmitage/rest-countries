@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "@ag-grid-community/react";
 import { ColDef } from "@ag-grid-community/core";
 import { transformCountryData } from "../utils/countryUtils";
-import { IRow, Country } from "./../utils/types";
+import { GridRow, Country } from "./../utils/types";
 import "@ag-grid-community/styles/ag-grid.css";
 import "@ag-grid-community/styles/ag-theme-quartz.css";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
@@ -16,13 +16,15 @@ interface CountriesGridProps {
 export const CountriesGrid: React.FC<CountriesGridProps> = ({
   selectedCountry,
 }) => {
-  const [rowData, setRowData] = useState<IRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [rowData, setRowData] = useState<GridRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch countries on app load - limited to certain fields to reduce data transfer
   useEffect(() => {
     const fetchCountries = async () => {
       try {
+        setLoading(true);
         const response = await fetch(
           "https://restcountries.com/v3.1/all?fields=name,flag,population,languages,currencies"
         );
@@ -35,6 +37,7 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
           localStorage.getItem("favourites") || "{}"
         );
 
+        // Transform raw data to the format needed for AG Grid
         const transformedData = data.map((country) => {
           const countryData = transformCountryData(country);
           return {
@@ -43,6 +46,7 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
           };
         });
 
+        // Present data to user
         setRowData(transformedData);
       } catch (error) {
         setError(
@@ -56,6 +60,7 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
     fetchCountries();
   }, []);
 
+  // Save favourites to local storage
   const saveFavouritesToLocalStorage = useCallback(() => {
     const favourites: { [key: string]: boolean } = {};
     rowData.forEach((row) => {
@@ -66,10 +71,11 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
     localStorage.setItem("favourites", JSON.stringify(favourites));
   }, [rowData]);
 
+  // Handle the rendering of the special favourites cell
   const FavouriteRenderer = (props: {
     value: boolean;
     node: any;
-    data: IRow;
+    data: GridRow;
   }) => {
     const { value, node, data } = props;
     const isFavourite = value;
@@ -92,9 +98,10 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
     );
   };
 
-  const [colDefs, setColDefs] = useState<ColDef<IRow>[]>([
+  // Define columns using the types defined in GridRow
+  const [colDefs, setColDefs] = useState<ColDef<GridRow>[]>([
     { field: "name" },
-    { field: "flag" },
+    { field: "flag", sortable: false },
     { field: "population", filter: "agNumberColumnFilter" },
     { field: "languages" },
     { field: "currencies" },
@@ -106,6 +113,16 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
     filter: "agTextColumnFilter",
   };
 
+  // Simple loading and error handling
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  // Return the styled grid
   return (
     <div
       className={"ag-theme-quartz"}
@@ -118,6 +135,7 @@ export const CountriesGrid: React.FC<CountriesGridProps> = ({
         onRowClicked={(e) => selectedCountry(e.node.data.name)}
         pagination={true}
         paginationPageSize={10}
+        paginationPageSizeSelector={[10, 20, 50]}
         domLayout="autoHeight"
         onCellClicked={saveFavouritesToLocalStorage}
       />
